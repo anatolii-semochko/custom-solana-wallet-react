@@ -1,0 +1,65 @@
+{
+  "name": "sevens-wallet-react",
+  "version": "1.0.0",
+  "description": "A custom Solana wallet adapter built on top of Phantom Wallet Adapter interface with comprehensive UI components for wallet management",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "type": "module",
+  "keywords": [
+    "solana",
+    "wallet",
+    "adapter",
+    "react",
+    "blockchain",
+    "crypto",
+    "web3"
+  ],
+  "author": "Anatolii",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/sevens-wallet-react.git"
+  },
+  "homepage": "https://github.com/username/sevens-wallet-react#readme",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.29.0",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/web3.js": "^1.98.4",
+    "bip39": "^3.0.4",
+    "bs58": "^6.0.0",
+    "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
+    "ed25519-hd-key": "^1.3.0",
+    "lucide-react": "^0.536.0",
+    "react-qr-code": "^2.0.8",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
+    "@types/bs58": "^4.0.4",
+    "@types/crypto-js": "^4.2.2",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  },
+  "scripts": {
+    "build": "echo 'Build script not configured yet'",
+    "test": "echo 'Test script not configured yet'"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "src/**/*",
+    "README.md",
+    "package.json"
+  ]
+}

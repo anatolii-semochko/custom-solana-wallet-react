@@ -1,0 +1,21 @@
+{
+  "STORAGE_WALLET_KEY": "sevens_wallet",
+  "STORAGE_WALLET_STATE_KEY": "sevens_wallet_state",
+  "STORAGE_WALLET_TOKENS_KEY": "sevens_wallet_tokens",
+  "SEVENS_TOKEN_IDL_PATH": "https://api.example.com/token-metadata.json",
+  "CONNECTION_ENDPOINTS": {
+    "main": "https://api.mainnet-beta.solana.com",
+    "dev": "https://api.devnet.solana.com",
+    "local": "http://localhost:8899",
+    "custom": ""
+  },
+  "LANGUAGES": {
+    "en": "English",
+    "uk": "Українська",
+    "es": "Español",
+    "de": "Deutsch"
+  },
+  "PASSWORD_MIN_LENGTH": 6,
+  "PASSWORD_REPEAT_DELAY_SECONDS": 5,
+  "RELOAD_AFTER_CHANGES_SECONDS": 3
+}
