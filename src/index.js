@@ -2,7 +2,19 @@
 export { SevensWalletAdapter } from './SevensWalletAdapter.js'
 export { default as SevensWalletProvider } from './SevensWalletProvider.js'
 export { default as SevensWalletInitializer } from './SevensWalletInitializer.jsx'
+export { default as SevensWalletConfigurableProvider } from './SevensWalletConfigurableProvider.jsx'
 export { default as Wallet } from './Wallet.js'
+
+// Configuration
+export {
+    SevensWalletConfigProvider,
+    useWalletConfig
+} from './context/ConfigContext.js'
+export {
+    getConfig,
+    getConfigValue,
+    safeGetConfig
+} from './utils/config.js'
 
 // Context and hooks
 export { WalletContext } from './context/WalletContext.js'

@@ -66,6 +66,41 @@ function App() {
 export default App
 ```
 
+### With Custom Configuration
+
+```jsx
+import {
+  SevensWalletConfigurableProvider,
+  SevensWalletInitializer,
+  WalletContent
+} from 'sevens-wallet-react'
+
+// Custom configuration
+const customConfig = {
+  CONNECTION_ENDPOINTS: {
+    main: 'https://your-custom-rpc.com',
+    dev: 'https://your-dev-rpc.com'
+  },
+  SEVENS_TOKEN_IDL_PATH: 'https://your-domain.com/token-metadata.json',
+  PASSWORD_MIN_LENGTH: 8,
+  LANGUAGES: {
+    en: 'English',
+    uk: 'Українська',
+    fr: 'Français'  // Add custom language
+  }
+}
+
+function App() {
+  return (
+    <SevensWalletConfigurableProvider config={customConfig}>
+      <SevensWalletInitializer>
+        <WalletContent />
+      </SevensWalletInitializer>
+    </SevensWalletConfigurableProvider>
+  )
+}
+```
+
 ### With Solana Wallet Adapter
 
 ```jsx
@@ -101,6 +136,23 @@ import { SevensWalletProvider } from 'sevens-wallet-react'
 <SevensWalletProvider>
   {/* Your wallet components */}
 </SevensWalletProvider>
+```
+
+#### `SevensWalletConfigurableProvider`
+Advanced provider with external configuration support.
+
+```jsx
+import { SevensWalletConfigurableProvider } from 'sevens-wallet-react'
+
+const config = {
+  CONNECTION_ENDPOINTS: {
+    main: 'https://api.mainnet-beta.solana.com'
+  }
+}
+
+<SevensWalletConfigurableProvider config={config}>
+  {/* Your wallet components */}
+</SevensWalletConfigurableProvider>
 ```
 
 #### `SevensWalletInitializer`
@@ -227,19 +279,129 @@ const signature = await adapter.signTransaction(transaction)
 const signature = await adapter.signMessage(message)
 ```
 
+### Configuration Hooks
+
+#### `useWalletConfig`
+Access current wallet configuration in React components.
+
+```jsx
+import { useWalletConfig } from 'sevens-wallet-react'
+
+function MyComponent() {
+  const config = useWalletConfig()
+
+  return (
+    <div>
+      <p>Main RPC: {config.CONNECTION_ENDPOINTS.main}</p>
+      <p>Min Password Length: {config.PASSWORD_MIN_LENGTH}</p>
+    </div>
+  )
+}
+```
+
+#### Configuration Utilities
+
+```jsx
+import {
+  getConfig,
+  getConfigValue,
+  safeGetConfig
+} from 'sevens-wallet-react'
+
+// Get full config (React context required)
+const config = getConfig()
+
+// Get specific value with fallback
+const minLength = getConfigValue('PASSWORD_MIN_LENGTH', 6)
+
+// Safe config access (works everywhere)
+const safeConfig = safeGetConfig()
+```
+
 ## ⚙️ Configuration
 
-### Network Configuration
+### External Configuration
+
+The library supports external configuration to override default settings without modifying package files.
+
+#### Method 1: Using SevensWalletConfigurableProvider
+
+```jsx
+import { SevensWalletConfigurableProvider } from 'sevens-wallet-react'
+
+const customConfig = {
+  CONNECTION_ENDPOINTS: {
+    main: 'https://your-mainnet-rpc.com',
+    dev: 'https://your-devnet-rpc.com',
+    custom: 'https://your-custom-network.com'
+  },
+  SEVENS_TOKEN_IDL_PATH: 'https://your-api.com/token-metadata.json',
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_REPEAT_DELAY_SECONDS: 10,
+  LANGUAGES: {
+    en: 'English',
+    uk: 'Українська',
+    es: 'Español',
+    de: 'Deutsch',
+    fr: 'Français'  // Add new language
+  }
+}
+
+function App() {
+  return (
+    <SevensWalletConfigurableProvider config={customConfig}>
+      {/* Your app components */}
+    </SevensWalletConfigurableProvider>
+  )
+}
+```
+
+#### Method 2: Using Separate Config Provider
+
+```jsx
+import {
+  SevensWalletConfigProvider,
+  SevensWalletProvider,
+  useWalletConfig
+} from 'sevens-wallet-react'
+
+function App() {
+  return (
+    <SevensWalletConfigProvider config={customConfig}>
+      <SevensWalletProvider>
+        <MyWalletComponents />
+      </SevensWalletProvider>
+    </SevensWalletConfigProvider>
+  )
+}
+
+// Access config in components
+function MyComponent() {
+  const config = useWalletConfig()
+  const endpoint = config.CONNECTION_ENDPOINTS.main
+
+  return <div>Connected to: {endpoint}</div>
+}
+```
+
+### Default Configuration
 
 ```javascript
-// src/config.json
+// Default configuration (read-only in npm package)
 {
   "CONNECTION_ENDPOINTS": {
     "main": "https://api.mainnet-beta.solana.com",
     "dev": "https://api.devnet.solana.com",
     "local": "http://localhost:8899",
     "custom": ""
-  }
+  },
+  "SEVENS_TOKEN_IDL_PATH": "https://api.example.com/token-metadata.json",
+  "STORAGE_WALLET_KEY": "sevens_wallet",
+  "STORAGE_WALLET_STATE_KEY": "sevens_wallet_state",
+  "STORAGE_WALLET_TOKENS_KEY": "sevens_wallet_tokens",
+  "PASSWORD_MIN_LENGTH": 6,
+  "PASSWORD_REPEAT_DELAY_SECONDS": 5,
+  "RELOAD_AFTER_CHANGES_SECONDS": 3
 }
 ```
 

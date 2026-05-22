@@ -1,7 +1,7 @@
 {
   "name": "sevens-wallet-react",
-  "version": "1.0.0",
-  "description": "A custom Solana wallet adapter built on top of Phantom Wallet Adapter interface with comprehensive UI components for wallet management",
+  "version": "1.1.0",
+  "description": "A custom Solana wallet adapter built on top of Phantom Wallet Adapter interface with comprehensive UI components for wallet management and external configuration support",
   "main": "src/index.js",
   "module": "src/index.js",
   "type": "module",
@@ -12,7 +12,10 @@
     "react",
     "blockchain",
     "crypto",
-    "web3"
+    "web3",
+    "configurable",
+    "typescript",
+    "phantom-compatible"
   ],
   "author": "Anatolii",
   "license": "MIT",
