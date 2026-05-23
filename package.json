@@ -1,5 +1,5 @@
 {
-  "name": "sevens-wallet-react",
+  "name": "custom-solana-wallet-react",
   "version": "1.1.0",
   "description": "A custom Solana wallet adapter built on top of Phantom Wallet Adapter interface with comprehensive UI components for wallet management and external configuration support",
   "main": "src/index.js",
@@ -21,9 +21,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/username/sevens-wallet-react.git"
+    "url": "git+https://github.com/anatolii-semochko/custom-solana-wallet-react.git"
   },
-  "homepage": "https://github.com/username/sevens-wallet-react#readme",
+  "homepage": "https://github.com/anatolii-semochko/custom-solana-wallet-react#readme",
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

@@ -2,7 +2,7 @@
 
 A comprehensive React library for building custom Solana wallet interfaces. Built on top of the Phantom Wallet Adapter interface with full compatibility and extended functionality.
 
-## 🚀 Features
+## Features
 
 ### Core Wallet Adapter
 - **Full Phantom API Compatibility**: Drop-in replacement for Phantom wallet with identical interface
@@ -35,13 +35,13 @@ A comprehensive React library for building custom Solana wallet interfaces. Buil
 - **Modular Architecture**: Import only the components you need
 - **Comprehensive Documentation**: Detailed API reference and examples
 
-## 📦 Installation
+## Installation
 
 ```bash
-npm install sevens-wallet-react
+npm install custom-solana-wallet-react
 ```
 
-## 🛠 Quick Start
+## Quick Start
 
 ### Basic Setup
 
@@ -123,7 +123,7 @@ function App() {
 }
 ```
 
-## 🧩 Components
+## Components
 
 ### Core Components
 
@@ -230,7 +230,7 @@ import {
 <Messages.Error>Error message</Messages.Error>
 ```
 
-## 🔧 API Reference
+## API Reference
 
 ### Hooks
 
@@ -318,7 +318,7 @@ const minLength = getConfigValue('PASSWORD_MIN_LENGTH', 6)
 const safeConfig = safeGetConfig()
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### External Configuration
 
@@ -429,7 +429,7 @@ function MyComponent() {
 }
 ```
 
-## 🔐 Security Features
+## Security Features
 
 - **Encrypted Local Storage**: All sensitive data encrypted with AES
 - **Password Protection**: Required for all critical operations
@@ -437,7 +437,7 @@ function MyComponent() {
 - **Transaction Validation**: Pre-signing simulation and validation
 - **Error Handling**: Secure error messages without data leakage
 
-## 🌐 Internationalization
+## Internationalization
 
 The library includes complete translations for:
 
@@ -448,14 +448,88 @@ The library includes complete translations for:
 
 All UI text, error messages, and help content are fully localized.
 
-## 📱 Responsive Design
+## Responsive Design
 
 - Mobile-first responsive design
 - Touch-friendly interface elements
 - Adaptive layouts for all screen sizes
 - Progressive enhancement for desktop features
 
-## 🧪 Token Operations
+## UI Screenshots
+
+### Core Wallet Interface
+
+<div align="center">
+  <img src="docs/images/02-main-wallet.png" alt="Main Wallet Interface" width="300"/>
+  <img src="docs/images/09-wallet-with-tokens.png" alt="Wallet with Tokens" width="300"/>
+</div>
+
+*Main wallet interface with balance display and token management*
+
+### Authentication & Security
+
+<div align="center">
+  <img src="docs/images/01-unlock-wallet.png" alt="Unlock Wallet" width="300"/>
+  <img src="docs/images/16-private-key-view.png" alt="Private Key Security" width="300"/>
+</div>
+
+*Secure authentication and private key management*
+
+### Multi-Wallet Management
+
+<div align="center">
+  <img src="docs/images/07-wallets-list.png" alt="Multiple Wallets" width="300"/>
+  <img src="docs/images/08-single-wallet-actions.png" alt="Wallet Actions" width="300"/>
+</div>
+
+*Multiple wallet support with individual wallet management*
+
+### Wallet Creation & Recovery
+
+<div align="center">
+  <img src="docs/images/12-add-new-wallet.png" alt="Add New Wallet" width="300"/>
+  <img src="docs/images/13-generate-wallet.png" alt="Generate Wallet" width="300"/>
+</div>
+
+<div align="center">
+  <img src="docs/images/14-save-seed-phrase.png" alt="Save Seed Phrase" width="300"/>
+  <img src="docs/images/15-confirm-seed-phrase.png" alt="Confirm Seed Phrase" width="300"/>
+</div>
+
+*Complete wallet creation flow with secure seed phrase management*
+
+### Transaction Operations
+
+<div align="center">
+  <img src="docs/images/11-send-coins.png" alt="Send Coins" width="300"/>
+  <img src="docs/images/06-receive-crypto.png" alt="Receive Crypto" width="300"/>
+</div>
+
+*Send and receive cryptocurrency with QR code support*
+
+### Token Management
+
+<div align="center">
+  <img src="docs/images/10-token-details.png" alt="Token Details" width="300"/>
+  <img src="docs/images/17-restore-wallet.png" alt="Wallet Recovery" width="300"/>
+</div>
+
+*Detailed token information and wallet recovery options*
+
+### Settings & Configuration
+
+<div align="center">
+  <img src="docs/images/03-settings.png" alt="Wallet Settings" width="300"/>
+  <img src="docs/images/04-language-settings.png" alt="Language Settings" width="300"/>
+</div>
+
+<div align="center">
+  <img src="docs/images/05-network-selection.png" alt="Network Selection" width="300"/>
+</div>
+
+*Comprehensive settings with multi-language support and network configuration*
+
+## Token Operations
 
 ### SPL Token Support
 - Automatic token account creation
@@ -470,7 +544,7 @@ All UI text, error messages, and help content are fully localized.
 - Batch transaction support
 - Custom program interaction via Anchor
 
-## 🔧 Development
+## Development
 
 ### Prerequisites
 
@@ -500,11 +574,73 @@ import type {
 } from 'sevens-wallet-react'
 ```
 
-## 📄 License
+---
 
-MIT License - see [LICENSE](LICENSE) file for details.
+## Sevens Ecosystem
 
-## 🤝 Contributing
+The Sevens platform consists of four interconnected projects that work together to provide a complete blockchain tokenization solution:
+
+### **[Sevens Backoffice](https://github.com/anatolii-semochko/sevens-backoffice)**
+*Administrative control center and revenue management platform*
+- **Technology**: PHP/Symfony, React/Redux, MySQL, Docker
+- **Purpose**: Administrative dashboard for token operations monitoring, fee configuration, user management, and financial analytics
+- **Key Features**: Real-time transaction monitoring, emergency system controls, tariff management, comprehensive reporting
+
+### **[Sevens Platform](https://github.com/anatolii-semochko/sevens-platform)**
+*Main user-facing application for digital material tokenization and trading*
+- **Technology**: PHP/Symfony, React/TypeScript, MySQL, AWS S3, Docker
+- **Purpose**: Complete web platform for creating, managing, and trading blockchain tokens representing digital materials
+- **Key Features**: Token creation & management, marketplace functionality, wallet integration, file storage & CDN
+
+### **[Sevens Smart Contracts](https://github.com/anatolii-semochko/sevens-smartcontracts)**
+*Enterprise-grade NFT marketplace infrastructure built on Solana*
+- **Technology**: Rust, Anchor Framework, Solana blockchain
+- **Purpose**: Dual-contract token ecosystem with hash-validated NFTs and built-in marketplace functionality
+- **Key Features**: Hash-based uniqueness validation, dynamic fee collection, inter-contract communication, governance layer
+
+### **[Sevens Wallet React](https://github.com/anatolii-semochko/custom-solana-wallet-react)**
+*Custom Solana wallet interface library with extended functionality*
+- **Technology**: React, TypeScript, Solana Web3.js, CryptoJS
+- **Purpose**: Comprehensive React library for building custom wallet interfaces compatible with Phantom API
+- **Key Features**: Multi-language support, encrypted storage, transaction validation, modular architecture
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      SEVENS ECOSYSTEM                           │
+│                                                                 │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐ │
+│  │   BACKOFFICE    │    │    PLATFORM     │    │   WALLET     │ │
+│  │   (Admin)       │◄──►│  (User App)     │◄──►│  (Library)   │ │
+│  │ • Fee Config    │    │ • Token Trading │    │ • UI Comps   │ │
+│  │ • Monitoring    │    │ • Marketplace   │    │ • Security   │ │
+│  │ • Analytics     │    │ • File Storage  │    │ • Multi-lang │ │
+│  └─────────────────┘    └─────────────────┘    └──────────────┘ │
+│           │                        │                    │       │
+│           │                        │                    │       │
+│           └────────────────────────┼────────────────────┘       │
+│                                    │                            │
+│                    ┌───────────────▼───────────────┐            │
+│                    │        SMART CONTRACTS        │            │
+│                    │         (Blockchain)          │            │
+│                    │ • Token Operations            │            │
+│                    │ • Marketplace Logic           │            │
+│                    │ • Fee Collection              │            │
+│                    │ • Hash Validation             │            │
+│                    └───────────────────────────────┘            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+This integrated ecosystem provides a complete solution for blockchain-based digital asset tokenization, from smart contract infrastructure to user interfaces and administrative tools.
+
+---
+
+## License
+
+MIT License
+
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -512,10 +648,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📞 Support
+## Support
 
-For questions and support, please open an issue on the [GitHub repository](https://github.com/username/sevens-wallet-react/issues).
-
----
+For questions and support, please open an issue on the [GitHub repository](https://github.com/anatolii-semochko/custom-solana-wallet-react/issues).
 
 **Note**: This library is designed for educational and development purposes. Always follow security best practices when handling cryptocurrency wallets in production applications.
