@@ -529,6 +529,333 @@ All UI text, error messages, and help content are fully localized.
 
 *Comprehensive settings with multi-language support and network configuration*
 
+## Wallet Technical Workflows
+
+### Wallet Initialization & Authentication Workflow
+
+#### Process Overview
+The wallet initialization process handles secure wallet creation, password setup, and encrypted storage with automatic session management and multi-wallet support.
+
+#### Detailed Technical Flow
+
+```mermaid
+sequenceDiagram
+    participant User as User
+    participant WalletProvider as Wallet Provider<br/>(React Context)
+    participant Storage as Encrypted Storage<br/>(LocalStorage + CryptoJS)
+    participant Crypto as Crypto Module<br/>(BIP39/Ed25519)
+    participant Solana as Solana Network<br/>(RPC Connection)
+
+    Note over User,Solana: Phase 1: Initial Setup & Password Creation
+    User->>WalletProvider: First wallet access
+    WalletProvider->>Storage: Check existing wallets<br/>getWalletStateProperty()
+    Storage-->>WalletProvider: No wallets found
+
+    WalletProvider->>User: Show wallet creation interface
+    User->>WalletProvider: Create password (min 6 chars)
+    WalletProvider->>WalletProvider: Validate password strength
+    WalletProvider->>Storage: Encrypt and store password hash<br/>CryptoJS.AES.encrypt()
+
+    Note over User,Solana: Phase 2: Mnemonic Generation & Validation
+    User->>WalletProvider: Generate new wallet
+    WalletProvider->>Crypto: Generate mnemonic phrase<br/>bip39.generateMnemonic(128)
+    Crypto-->>WalletProvider: 12-word seed phrase
+
+    WalletProvider->>User: Display seed phrase<br/>for secure backup
+    User->>WalletProvider: Confirm seed phrase<br/>word verification
+    WalletProvider->>Crypto: Validate mnemonic<br/>bip39.validateMnemonic()
+
+    Note over User,Solana: Phase 3: Keypair Derivation & Storage
+    WalletProvider->>Crypto: Derive keypair from mnemonic<br/>derivePath(m/44'/777'/0'/0')
+    Crypto->>Crypto: Generate Ed25519 keypair<br/>from HD seed
+    Crypto-->>WalletProvider: PublicKey + PrivateKey
+
+    WalletProvider->>Storage: Encrypt and store wallet data<br/>• Encrypted private key<br/>• Wallet metadata<br/>• Creation timestamp
+    Storage-->>WalletProvider: Wallet stored successfully
+
+    Note over User,Solana: Phase 4: Network Connection & Balance Loading
+    WalletProvider->>Solana: Connect to RPC endpoint<br/>getConnection(endpoint)
+    Solana-->>WalletProvider: Connection established
+    WalletProvider->>Solana: Get account balance<br/>connection.getBalance(publicKey)
+    Solana-->>WalletProvider: SOL balance + lamports
+
+    WalletProvider->>User: Wallet ready for use<br/>Balance displayed
+```
+
+### Wallet Authentication & Session Management
+
+#### Secure Login Flow
+
+```mermaid
+sequenceDiagram
+    participant User as User
+    participant Auth as Authentication Layer
+    participant Storage as Encrypted Storage
+    participant Context as Wallet Context
+    participant Timer as Session Timer
+
+    Note over User,Timer: Phase 1: Password Authentication
+    User->>Auth: Enter wallet password
+    Auth->>Storage: Retrieve encrypted data<br/>getWalletStateProperty()
+    Storage-->>Auth: Encrypted wallet hash
+
+    Auth->>Auth: Decrypt password hash<br/>CryptoJS.AES.decrypt()
+    Auth->>Auth: Validate password match<br/>bcrypt.compare()
+
+    alt Password valid
+        Auth->>Context: Set unlocked state<br/>setUnlocked(true)
+        Auth->>Timer: Start session timer<br/>PASSWORD_REPEAT_DELAY_SECONDS
+        Auth-->>User: Access granted
+    else Password invalid
+        Auth->>Auth: Increment failed attempts
+        Auth-->>User: Access denied<br/>Security delay applied
+    end
+
+    Note over User,Timer: Phase 2: Session Management
+    Timer->>Timer: Monitor session activity
+    Timer->>Context: Auto-lock after inactivity<br/>setUnlocked(false)
+    Context->>Storage: Clear sensitive data<br/>from memory
+
+    Note over User,Timer: Phase 3: Multi-Wallet Access
+    Context->>Storage: Load all wallet metadata<br/>setWalletsList()
+    Storage-->>Context: Encrypted wallet list
+    Context->>User: Display available wallets<br/>with quick switch options
+```
+
+### Transaction Signing & Validation Workflow
+
+#### Process Overview
+Comprehensive transaction handling with pre-signing validation, simulation, fee calculation, and secure user confirmation before blockchain submission.
+
+#### Detailed Technical Flow
+
+```mermaid
+sequenceDiagram
+    participant DApp as DApp<br/>(External Application)
+    participant Adapter as Sevens Wallet Adapter<br/>(Bridge Interface)
+    participant Validator as Transaction Validator<br/>(Security Layer)
+    participant Simulator as Transaction Simulator<br/>(Pre-validation)
+    participant UI as Signing UI<br/>(User Interface)
+    participant Blockchain as Solana Network
+
+    Note over DApp,Blockchain: Phase 1: Transaction Request & Initial Validation
+    DApp->>Adapter: signTransaction(transaction)
+    Adapter->>Adapter: Check wallet connection<br/>requireConnection()
+    Adapter->>Validator: Validate transaction structure<br/>validateTransaction()
+
+    Validator->>Validator: Check transaction format<br/>• Valid instructions<br/>• Account requirements<br/>• Program validations
+    Validator-->>Adapter: Validation results
+
+    alt Transaction invalid
+        Validator-->>DApp: Throw WalletSignTransactionError<br/>with detailed error message
+    end
+
+    Note over DApp,Blockchain: Phase 2: Transaction Simulation & Fee Calculation
+    Adapter->>Simulator: Simulate transaction<br/>connection.simulateTransaction()
+    Simulator->>Blockchain: Send simulation request<br/>with skipPreflight: false
+    Blockchain-->>Simulator: Simulation results<br/>• Success/failure status<br/>• Compute units used<br/>• Account changes
+
+    Simulator->>Simulator: Calculate transaction fees<br/>• Base fee calculation<br/>• Compute unit pricing<br/>• Priority fee estimation
+    Simulator-->>Adapter: Fee estimate + simulation data
+
+    Note over DApp,Blockchain: Phase 3: User Confirmation Interface
+    Adapter->>UI: Display signing interface<br/>with transaction details
+    UI->>UI: Parse transaction data<br/>• Recipient addresses<br/>• Transfer amounts<br/>• Program interactions<br/>• Fee breakdown
+
+    UI->>User: Show confirmation dialog<br/>• Transaction summary<br/>• Security warnings<br/>• Fee information<br/>• Account balances
+
+    User->>UI: Review and confirm/reject
+    alt User rejects
+        UI-->>DApp: User rejected transaction
+    end
+
+    Note over DApp,Blockchain: Phase 4: Cryptographic Signing & Submission
+    UI->>Adapter: User approved transaction
+    Adapter->>Adapter: Retrieve private key<br/>from encrypted storage
+    Adapter->>Adapter: Sign transaction<br/>ed25519.sign(transaction, privateKey)
+
+    Adapter->>Blockchain: Submit signed transaction<br/>connection.sendRawTransaction()
+    Blockchain-->>Adapter: Transaction signature<br/>+ confirmation status
+    Adapter-->>DApp: Return transaction signature
+```
+
+### Token Management & SPL Operations
+
+#### Multi-Token Workflow
+
+```mermaid
+stateDiagram-v2
+    [*] --> TokenDiscovery : Load wallet
+
+    TokenDiscovery --> TokenList : Scan for SPL tokens
+    TokenList --> TokenDetails : Select token
+    TokenList --> TokenTransfer : Send token
+    TokenList --> TokenBurn : Burn token
+
+    TokenDetails --> TokenList : Back to list
+    TokenTransfer --> TransactionSigning : Confirm transfer
+    TokenBurn --> TransactionSigning : Confirm burn
+
+    TransactionSigning --> Success : Transaction confirmed
+    TransactionSigning --> Failed : Transaction failed
+    TransactionSigning --> TokenList : User cancelled
+
+    Success --> TokenList : Update balances
+    Failed --> TokenList : Show error
+
+    note right of TokenDiscovery : • Query all token accounts
+                                  • Load token metadata
+                                  • Calculate USD values
+
+    note right of TokenTransfer : • Validate recipient address
+                                 • Check sufficient balance
+                                 • Calculate transfer fees
+
+    note right of TokenBurn : • Confirm burn permissions
+                             • Validate token ownership
+                             • Calculate burn costs
+```
+
+### Security & Encryption Architecture
+
+#### Data Protection Flow
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                           SECURITY ARCHITECTURE                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+    USER INPUT                ENCRYPTION LAYER               STORAGE LAYER
+┌─────────────────┐        ┌─────────────────────┐       ┌───────────────────┐
+│    Passwords    │        │    CryptoJS AES     │       │   Local Storage   │
+│   Private Keys  │   ──►  │   • 256-bit keys    │  ──►  │  • Encrypted      │
+│   Seed Phrases  │        │   • PBKDF2 hashing  │       │  • Compartmented  │
+│   Wallet Data   │        │   • Salt generation │       │  • Versioned      │
+└─────────────────┘        └─────────────────────┘       └───────────────────┘
+         │                            │                            │
+         ▼                            ▼                            ▼
+┌─────────────────┐        ┌─────────────────────┐       ┌───────────────────┐
+│ Input Validate  │        │    Key Derivation   │       │   Data Recovery   │
+│  • Length check │        │  • BIP39 standard   │       │  • Backup/Restore │
+│  • Format valid │        │  • Ed25519 crypto   │       │  • Migration      │
+│  • Strength test│        │  • HD derivation    │       │  • Cleanup        │
+└─────────────────┘        └─────────────────────┘       └───────────────────┘
+
+                             RUNTIME PROTECTION
+                     ┌─────────────────────────────────┐
+                     │        Memory Management        │
+                     │  • Sensitive data clearing      │
+                     │  • Session timeouts             │
+                     │  • Automatic locks              │
+                     │  • Secure key handling          │
+                     └─────────────────────────────────┘
+```
+
+### Multi-Language Support Workflow
+
+#### Internationalization Architecture
+
+```mermaid
+flowchart TD
+    A[User Language Request] --> B{Language Available?}
+    B -->|Yes| C[Load Translation Bundle]
+    B -->|No| D[Fallback to English]
+
+    C --> E[Apply Translations]
+    D --> E
+
+    E --> F[Update UI Components]
+    F --> G[Store Language Preference]
+    G --> H[Re-render Interface]
+
+    I[Component Render] --> J[Get Translation Key]
+    J --> K[Lookup Translation]
+    K --> L[Apply Formatting]
+    L --> M[Return Localized Text]
+
+    N[Number/Currency] --> O[Apply Locale Formatting]
+    O --> P[Display Formatted Value]
+
+    style C fill:#e1f5fe
+    style E fill:#f3e5f5
+    style F fill:#e8f5e8
+```
+
+### Wallet Adapter Integration Architecture
+
+#### Process Overview
+The Sevens Wallet Adapter provides seamless integration with existing Solana dApps through standard wallet adapter interface, maintaining full Phantom API compatibility while adding custom functionality.
+
+#### Component Integration Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      WALLET ADAPTER ECOSYSTEM                       │
+└─────────────────────────────────────────────────────────────────────┘
+
+    EXTERNAL DAPP           ADAPTER BRIDGE              WALLET CORE
+┌─────────────────┐      ┌─────────────────┐        ┌─────────────────┐
+│ DApp Interface  │      │ Sevens Adapter  │        │ Wallet Context  │
+│                 │      │                 │        │                 │
+│ • connect()     │◄────►│ • Phantom API   │◄──────►│ • State Mgmt    │
+│ • signTx()      │      │   Compatibility │        │ • Crypto Ops    │
+│ • signMsg()     │      │ • Event Bridge  │        │ • Storage       │
+│ • disconnect()  │      │ • Error Mapping │        │ • Security      │
+└─────────────────┘      └─────────────────┘        └─────────────────┘
+         │                         │                         │
+         ▼                         ▼                         ▼
+┌─────────────────┐      ┌─────────────────┐        ┌─────────────────┐
+│ Standard Events │      │ Custom Features │        │  UI Components  │
+│ • connect       │      │ • Multi-wallet  │        │ • SignTx Dialog │
+│ • disconnect    │      │ • Multi-language│        │ • Settings UI   │
+│ • accountChange │      │ • Config system │        │ • Token Mgmt    │
+└─────────────────┘      └─────────────────┘        └─────────────────┘
+```
+
+#### Adapter Lifecycle Management
+
+```mermaid
+sequenceDiagram
+    participant DApp as dApp
+    participant WalletAdapter as @solana/wallet-adapter
+    participant SevensAdapter as Sevens Adapter
+    participant WalletCore as Wallet Core
+    participant Window as Window Object
+
+    Note over DApp,Window: Phase 1: Adapter Registration & Discovery
+    SevensAdapter->>Window: Register wallet interface<br/>window.solana.isSevens = true
+    WalletAdapter->>Window: Scan for available wallets
+    Window-->>WalletAdapter: Sevens wallet detected
+    WalletAdapter-->>DApp: Wallet available for connection
+
+    Note over DApp,Window: Phase 2: Connection Establishment
+    DApp->>WalletAdapter: adapter.connect()
+    WalletAdapter->>SevensAdapter: Initiate connection
+    SevensAdapter->>WalletCore: Check wallet state<br/>isUnlocked()
+
+    alt Wallet locked
+        WalletCore->>SevensAdapter: Require authentication
+        SevensAdapter->>DApp: Show unlock interface
+    else Wallet unlocked
+        WalletCore->>SevensAdapter: Return public key
+        SevensAdapter->>WalletAdapter: Connection successful
+        WalletAdapter->>DApp: Emit 'connect' event
+    end
+
+    Note over DApp,Window: Phase 3: Transaction Operations
+    DApp->>WalletAdapter: adapter.signTransaction(tx)
+    WalletAdapter->>SevensAdapter: Forward signing request
+    SevensAdapter->>WalletCore: Process transaction<br/>• Validate<br/>• Simulate<br/>• User confirmation
+    WalletCore-->>SevensAdapter: Signed transaction
+    SevensAdapter-->>WalletAdapter: Return signature
+    WalletAdapter-->>DApp: Transaction signed
+
+    Note over DApp,Window: Phase 4: State Synchronization
+    WalletCore->>SevensAdapter: Account changed
+    SevensAdapter->>WalletAdapter: Emit account change
+    WalletAdapter->>DApp: Update UI state
+```
+
 ## Token Operations
 
 ### SPL Token Support
@@ -607,38 +934,34 @@ The Sevens platform consists of four interconnected projects that work together 
 ### Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      SEVENS ECOSYSTEM                           │
-│                                                                 │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐ │
-│  │   BACKOFFICE    │    │    PLATFORM     │    │   WALLET     │ │
-│  │   (Admin)       │◄──►│  (User App)     │◄──►│  (Library)   │ │
-│  │ • Fee Config    │    │ • Token Trading │    │ • UI Comps   │ │
-│  │ • Monitoring    │    │ • Marketplace   │    │ • Security   │ │
-│  │ • Analytics     │    │ • File Storage  │    │ • Multi-lang │ │
-│  └─────────────────┘    └─────────────────┘    └──────────────┘ │
-│           │                        │                    │       │
-│           │                        │                    │       │
-│           └────────────────────────┼────────────────────┘       │
-│                                    │                            │
-│                    ┌───────────────▼───────────────┐            │
-│                    │        SMART CONTRACTS        │            │
-│                    │         (Blockchain)          │            │
-│                    │ • Token Operations            │            │
-│                    │ • Marketplace Logic           │            │
-│                    │ • Fee Collection              │            │
-│                    │ • Hash Validation             │            │
-│                    └───────────────────────────────┘            │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                        SEVENS ECOSYSTEM                          │
+│                                                                  │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐  │
+│  │   BACKOFFICE    │    │    PLATFORM     │    │   WALLET     │  │
+│  │   (Admin)       │◄──►│  (User App)     │◄──►│  (Library)   │  │
+│  │ • Fee Config    │    │ • Token Trading │    │ • UI Comps   │  │
+│  │ • Monitoring    │    │ • Marketplace   │    │ • Security   │  │
+│  │ • Analytics     │    │ • File Storage  │    │ • Multi-lang │  │
+│  └─────────────────┘    └─────────────────┘    └──────────────┘  │
+│           │                      │                     │         │
+│           │                      │                     │         │
+│           └──────────────────────┼─────────────────────┘         │
+│                                  │                               │
+│                  ┌───────────────▼───────────────┐               │
+│                  │        SMART CONTRACTS        │               │
+│                  │         (Blockchain)          │               │
+│                  │     • Token Operations        │               │
+│                  │     • Marketplace Logic       │               │
+│                  │     • Fee Collection          │               │
+│                  │     • Hash Validation         │               │
+│                  └───────────────────────────────┘               │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 This integrated ecosystem provides a complete solution for blockchain-based digital asset tokenization, from smart contract infrastructure to user interfaces and administrative tools.
 
 ---
-
-## License
-
-MIT License
 
 ## Contributing
 
@@ -652,4 +975,9 @@ MIT License
 
 For questions and support, please open an issue on the [GitHub repository](https://github.com/anatolii-semochko/custom-solana-wallet-react/issues).
 
+## License
+
+MIT License
+
+## Security Notice
 **Note**: This library is designed for educational and development purposes. Always follow security best practices when handling cryptocurrency wallets in production applications.
